@@ -17,7 +17,8 @@ import {createStackNavigator} from 'react-navigation-stack';
 import {FontAwesome, Ionicons} from '@expo/vector-icons';
 import { purple, white } from './utils/colors';
 import Constants from 'expo-constants';
-import EntryDetail from './components/EntryDatail';
+import EntryDetail from './components/EntryDetail';
+import Live from './components/Live';
 
 function CuctomStatusBar({backgroundColor, ...props}){
   return(
@@ -40,6 +41,13 @@ const RouteConfigs = {
     navigationOptions:{
       tabBarLabel: 'Add Entry',
       tabBarIcon: ({tintColor}) => <FontAwesome name='plus-square' size={30} color={tintColor}/>
+    }
+  },
+  Live: {
+    screen: Live,
+    navigationOptions:{
+      tabBarLabel: 'Live',
+      tabBarIcon: ({tintColor}) => <Ionicons name='ios-speeddometer' size={30} color={tintColor}/>
     }
   }
 };

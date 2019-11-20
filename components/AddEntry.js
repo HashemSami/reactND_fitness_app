@@ -10,6 +10,7 @@ import {submitEntry, removeEntry} from '../utils/api';
 import {connect} from 'react-redux';
 import {addEntry} from '../actions';
 import {white, purple} from '../utils/colors';
+import {NavigationActions} from 'react-navigation';
 
 function SubmitBtn({onPress}){
     return(
@@ -24,9 +25,9 @@ function SubmitBtn({onPress}){
 class AddEntry extends Component{
     state={
         run:0,
-        bike:10,
+        bike:0,
         swim:0,
-        sleep:5,
+        sleep:0,
         eat:0,
     }
 
@@ -69,7 +70,7 @@ class AddEntry extends Component{
     submit = ()=>{
         // this will save the formated date from timeToString() function
         const key = timeToString();
-        const entry = this.state
+        const entry = this.state;
 
         // update redux
         this.props.dispatch(addEntry({
@@ -85,26 +86,37 @@ class AddEntry extends Component{
         }));
 
         // navigate to home
+        this.toHome();
 
         // save to 'DB'
-        submitEntry({key, entry})
+        submitEntry({key, entry});
 
         // clear local notification
 
     }
 
     reset = () => {
-        const key = timeToString()
+        const key = timeToString();
 
         // update Redux
         this.props.dispatch(addEntry({
             [key]: getDailyReminder(),
-        }))
+        }));
         
         // route to Home
+        this.toHome();
+
 
         // update 'DB'
-        removeEntry(key)
+        removeEntry(key);
+    }
+
+    // this will reset the AddEntry Component every time we submit or reset data
+    // by nagivat to the same component
+    toHome = () => {
+        this.props.navigation.dispatch(NavigationActions.back({
+            key: 'AddEntry'
+        }))
     }
 
     
