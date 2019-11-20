@@ -17,6 +17,7 @@ import {createStackNavigator} from 'react-navigation-stack';
 import {FontAwesome, Ionicons} from '@expo/vector-icons';
 import { purple, white } from './utils/colors';
 import Constants from 'expo-constants';
+import EntryDetail from './components/EntryDatail';
 
 function CuctomStatusBar({backgroundColor, ...props}){
   return(
@@ -61,10 +62,26 @@ const TabNavigatorConfig =  {
   }
 };
 
-const AppContainer = createAppContainer(
-  Platform.OS === 'ios'? createBottomTabNavigator(RouteConfigs,TabNavigatorConfig)
-  : createMaterialTopTabNavigator(RouteConfigs,TabNavigatorConfig)
-);
+const TabContainer = Platform.OS === 'ios'? createBottomTabNavigator(RouteConfigs,TabNavigatorConfig)
+  : createMaterialTopTabNavigator(RouteConfigs,TabNavigatorConfig);
+
+const StackNavigator = {
+  Home : {
+    screen: TabContainer,
+  },
+  EntryDetail:{
+    screen: EntryDetail,
+    navigationOptions:{
+      headerTintColor: white,
+      headerStyle:{
+        backgroundColor:purple,
+      }
+    }
+  }
+}
+
+
+const MainNavigation = createAppContainer(createStackNavigator(StackNavigator))
 
 
 export default class App extends React.Component {
@@ -76,7 +93,7 @@ export default class App extends React.Component {
       <Provider store={createStore(reducer)}>
         <View style={{flex:1}}>
           <CuctomStatusBar backgroundColor={purple} barStyle='light-content'/>
-          <AppContainer/>
+          <MainNavigation/>
         </View>
       </Provider>
     );
