@@ -2,6 +2,10 @@ import React from 'react';
 import {View, StyleSheet} from 'react-native';
 import {FontAwesome, MaterialIcons, MaterialCommunityIcons} from '@expo/vector-icons';
 import {white, red, orange, blue, lightPurp, pink } from './colors';
+import * as Permissions from 'expo-permissions';
+import { Notifications } from 'expo';
+
+const NOTIFICATION_KEY = 'UdaciFitness: notifications';
 
 export function isBetween (num, x, y) {
     if (num >= x && num <= y) {
@@ -163,4 +167,43 @@ export function isBetween (num, x, y) {
     return{
       today: "wave don't forget to log your data today"
     }
+  }
+
+  export function clearLocalNotification(){
+
+  }
+
+  export function createNotification(){
+    return{
+      title: 'log your stats!',
+      body: ':smile: \u{1f605} dont forget to log your stats for today!',
+      ios:{
+        sound: true
+      },
+      android:{
+        sound: true,
+        priority: 'high',
+        sticky: false,
+        vibrate: true
+        
+      }
+    }
+  }
+
+  // this is to set one notification
+  export function setLocalNotification(){
+
+    AsyncStorage.getItem(NOTIFICATION_KEY)
+      .then(JSON.parse)
+      .then((data) => {
+        if(data === null){
+          Permissions.askAsync(Permissions.NOTIFICATIONS)
+            .then(({status}) => {
+                if(status === 'granted'){
+                  
+                }
+            })
+        }
+      })
+
   }
