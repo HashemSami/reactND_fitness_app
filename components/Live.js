@@ -2,20 +2,80 @@ import React, {Component} from 'react';
 import  {View, Text, ActivityIndicator, TouchableOpacity, StyleSheet} from 'react-native';
 import {Foundation} from '@expo/vector-icons';
 import {purple, white} from '../utils/colors';
-import { Location } from 'expo';
+import * as Location from 'expo-location';
+import * as Permissions from 'expo-permissions';
+import {calculateDirection} from '../utils/helpers'
 
 class Live extends Component{
     state={
         cords:null,
-        status: 'a',
+        status: null,
         direction: ''
     }
 
-    askPermission(){
+    componentDidMount() {
+        // we need to make sure that we have the user permission first 
+        // so every time this component mount, it will ask for the user permission
+        Permissions.getAsync(Permissions.LOCATION)
+            .then(({status}) => {
+                // if the status returned 'granted' run the setLocation method
+                if(status === 'granted'){
+                    // the setLocation() method will updated the state status to 'granted'
+                    // and will updated withthe location every time the lacation changed
+                    return this.setLocation()
+                };
+                // if the status is not 'granted', go aheadt and update the state 
+                // with the status return
+                this.setState(() => ({status}));
+            })
+            .catch((error) => {
+                console.warn('Error getting Location permossion:', error)
+                // if there is any errors the component will render the 'undetermined'page
+                // to grant the user permission
+                this.setState(() => ({status: 'undetrmined'}));
+            })
+    }
+
+    askPermission = () => {
+        // this method will ensable the user to set thier permissions when he click the enable button
+        // it will return a status (same as getAsync), the will set the state based on the status
+        Permissions.askAsync(Permissions.LOCATION)
+            .then(({status}) => {
+                if(status === 'granted') { 
+                    return this.setLocation()
+                }
+                this.setState(() => ({status}))
+            })
+            .catch((error) => {
+                console.warn('error asking Location permission: ', error)
+            })
 
     }
+
+    // this method will invoked when we have permission of the user location
+    setLocation = () => {
+        Location.watchPositionAsync({
+            // give high accuracy for the lacation data
+            enableHighAccuracy : true,
+            // to update the location as fast as it can
+            timeInterval: 1,
+            distanceInterval: 1,
+        }, ({coords}) => {
+            // this function will be invoked every time the user change laction 
+            // and it will pass the coordenated to it's arguments
+            // will pass the coord.heading to helper function to get the string direction
+            const newDirection = calculateDirection(coords.heading);
+            const {direction} = this.state;
+
+            this.setState(() => ({
+                coords,
+                status: 'granted',
+                direction: newDirection,
+            }))
+        })
+    }
     render() {
-        const {cords, status, direction} = this.state;
+        const {coords, status, direction} = this.state;
 
         if (status === null) {
             // the Activity Indecator is the loding spinner 
@@ -34,7 +94,7 @@ class Live extends Component{
             )
         }
 
-        if(status === 'undetermind') {
+        if(status === 'undetermined') {
             return(
                 <View style={styles.center}>
                     <Foundation name='alert' size={50} />
@@ -53,7 +113,7 @@ class Live extends Component{
             <View style={styles.container}>
                 <View style={styles.directionContainer}>
                     <Text style={styles.header}>You're heading</Text>
-                    <Text style={styles.direction}>North</Text>
+                    <Text style={styles.direction}>{direction}</Text>
                 </View>
                 <View style={styles.metricContainer}>
                     <View style={styles.metric}>
@@ -61,7 +121,8 @@ class Live extends Component{
                             Altitude
                         </Text>
                         <Text style={[styles.subHeader, {color:white}]}>
-                            {200} feet
+                            {/* to convert to feet */}
+                            {Math.round(coords.altitude * 3.2808)} feet
                         </Text>
                     </View>
                     <View style={styles.metric}>
@@ -69,7 +130,7 @@ class Live extends Component{
                             Speed
                         </Text>
                         <Text style={[styles.subHeader, {color:white}]}>
-                            {300} MPH
+                            {(coords.speed * 2.2369).toFixed(1)} MPH
                         </Text>
                     </View>
                 </View>
