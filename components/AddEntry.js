@@ -1,6 +1,11 @@
 import React, {Component} from 'react';
 import{View, Text, TouchableOpacity, Platform, StyleSheet} from 'react-native';
-import{getMetricMetaInfo, timeToString, getDailyReminder} from '../utils/helpers';
+import{getMetricMetaInfo,
+    timeToString,
+    getDailyReminder,
+    clearLocalNotification,
+    setLocalNotification
+    } from '../utils/helpers';
 import FitnessSteppers from './FitnessStepper';
 import FitnessSlider from './FitnessSlider';
 import DateHeader from './DateHeader';
@@ -92,6 +97,12 @@ class AddEntry extends Component{
         submitEntry({key, entry});
 
         // clear local notification
+        // if the user alredy submitted the stats for today
+        // it will clear any other notification or it will not invoke the notification set
+        // and then will set a new notification for tomorrow
+        clearLocalNotification()
+            // we didn't add the () on the function
+            .then(setLocalNotification())
 
     }
 

@@ -19,6 +19,7 @@ import { purple, white } from './utils/colors';
 import Constants from 'expo-constants';
 import EntryDetail from './components/EntryDetail';
 import Live from './components/Live';
+import {setLocalNotification} from './utils/helpers';
 
 function CuctomStatusBar({backgroundColor, ...props}){
   return(
@@ -96,6 +97,11 @@ export default class App extends React.Component {
   state={
     value:0
   }
+
+  componentDidMount(){
+    setLocalNotification()
+  }
+  
   render(){
     return (
       <Provider store={createStore(reducer)}>
